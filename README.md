@@ -2,7 +2,13 @@
 
 ## Lab 1: Introduction to PHP
 
-Creating Simple contact form with validation
+####Creating Simple contact form with validation
+
+<video width="320" height="240" controls>
+  <source src="https://drive.google.com/file/d/1ipvRojJc6aYESj41lSm3TNE4mNgT8rZc/view?usp=sharing" type="video/mp4">
+
+</video>
+
 
 ### Resources
 
