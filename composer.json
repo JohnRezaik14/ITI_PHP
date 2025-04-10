@@ -1,0 +1,13 @@
+{
+    "name": "johnl/lab1",
+    "description": "ITI_PHP_Course",
+    "type": "project",
+    "authors": [
+        {
+            "name": "John Rezaik",
+            "email": "johnrezaik@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
