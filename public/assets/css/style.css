@@ -99,6 +99,13 @@ p {
   margin: 0%;
   padding: 0.1em 0;
 }
+.visitors-count {
+  width: fit-content;
+  margin: auto;
+  margin-top: 1rem;
+  font-size: 1.3rem;
+  color: cadetblue;
+}
 label,
 input,
 textarea,

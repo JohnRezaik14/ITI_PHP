@@ -22,13 +22,15 @@
         <a href="index.php?contact=1">Contact Form</a>
         <a href="messages.php">Messages History</a>
     </header>
+    <?php
+        echo "<p class='visitors-count' >Visitors Count: <span class='count' >" . $visitors . "</span> </p>";
+    ?>
     <main>
         <?php
+
             if (isset($_GET['contact'])) {
                 global $contactForm;
                 $contactForm->renderForm();
-            } else {
-                echo "<p>Visitors Count: " . $visitors . "</p>";
             }
         ?>
     </main>
