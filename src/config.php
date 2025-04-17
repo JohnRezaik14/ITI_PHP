@@ -22,6 +22,6 @@ return [
         ],
     ],
     'paths' => [
-        'css' => ['main' => './assets/css/style.css'],
+        'VisitorCount' => 'data/visitCount.txt',
     ],
 ];

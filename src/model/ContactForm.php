@@ -29,9 +29,9 @@
         private $logger;
         public function __construct(array $config)
         {
-            $this->config    = $config['form'];
+            $this->config    = $config;
             $this->validator = new FormValidator($config);
-            $this->logger    = new DataLogger($config['form']['log_file']);
+            $this->logger    = new DataLogger($config['log_file']);
             $this->initializeFormData();
         }
         // ? DataLogger for logging user data
@@ -76,6 +76,11 @@
                 }
             }
         }
+        public function clearFormData()
+        {
+            $this->formData = [];
+            $this->renderForm();
+        }
         public function collectFormData()
         {
             $this->formData = [
@@ -103,7 +108,7 @@
                     <!-- Name Field -->
                     <div class="row">
                         <label class="required" for="name">Name</label>
-                        <input id="name" class="input                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       <?php echo isset($this->errors['name']) ? 'error' : ''; ?>"
+                        <input id="name" class="input                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         <?php echo isset($this->errors['name']) ? 'error' : ''; ?>"
                                name="name" placeholder="Enter your name" type="text"
                                value="<?php echo htmlspecialchars($this->formData['name']); ?>" />
                         <?php if ($this->isSubmitted && isset($this->errors['name_err'])): ?>
@@ -116,7 +121,7 @@
                     <!-- Email Field -->
                     <div class="row">
                         <label class="required" for="email">Email</label>
-                        <input id="email" class="input                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     <?php echo isset($this->errors['email']) ? 'error' : ''; ?>"
+                        <input id="email" class="input                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 <?php echo isset($this->errors['email']) ? 'error' : ''; ?>"
                                name="email" type="text" placeholder="example@domain.com"
                                value="<?php echo htmlspecialchars($this->formData['email']); ?>" />
                         <?php if ($this->isSubmitted && isset($this->errors['email_err'])): ?>
@@ -129,7 +134,7 @@
                     <!-- Message Field -->
                     <div class="row">
                         <label class="required" for="message">Message</label>
-                        <textarea id="message" class="input                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           <?php echo isset($this->errors['message']) ? 'error' : ''; ?>"
+                        <textarea id="message" class="input                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         <?php echo isset($this->errors['message']) ? 'error' : ''; ?>"
                                   name="message" placeholder="Tell us your message" rows="7" cols="30"><?php echo htmlspecialchars($this->formData['message']); ?></textarea>
                         <?php if ($this->isSubmitted && isset($this->errors['message_err'])): ?>
                             <div class="err-container">
@@ -141,8 +146,7 @@
                     <!-- Form Buttons -->
                     <div class="buttons">
                         <input id="submit" name="submit" type="submit" value="Send email" />
-                        <input id="clear" name="clear" type="submit" value="Clear Form"
-                               formnovalidate formaction="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>?clear=true" />
+                        <a id="clear" href="index.php?contact=1" class="button">Clear Form</a>
                     </div>
                 </div>
             </form>

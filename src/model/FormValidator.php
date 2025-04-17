@@ -11,7 +11,7 @@ class FormValidator
     public function __construct(array $config)
     {
         $this->config           = $config;
-        $this->formErrorsConfig = $this->config['form']['err_msg'];
+        $this->formErrorsConfig = $this->config['err_msg'];
 
     }
     public function validate(array $data)
@@ -30,7 +30,7 @@ class FormValidator
         $name = trim($name);
         if (empty($name)) {
             $error = $this->formErrorsConfig['name']['empty'];
-        } else if (strlen($name) > $this->config['form']['max_name_length']) {
+        } else if (strlen($name) > $this->config['max_name_length']) {
             $error = $this->formErrorsConfig['name']['length'];
         }
 
@@ -53,7 +53,7 @@ class FormValidator
         $message = trim($message);
         if (empty($message)) {
             $error = $this->formErrorsConfig['message']['empty'];
-        } else if (strlen($message) < 10 || strlen($message) > $this->config['form']['max_msg_length']) {
+        } else if (strlen($message) < 10 || strlen($message) > $this->config['max_msg_length']) {
             $error = $this->formErrorsConfig['message']['length'];
         }
         return $error;

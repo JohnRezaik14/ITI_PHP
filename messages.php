@@ -1,11 +1,9 @@
 <?php
     $formconfig = require_once './src/config.php';
-    require_once './src/DataLogger.php';
+    require_once './src/model/DataLogger.php';
 
-    // Get log file path from config
     $logFilePath = $formconfig['form']['log_file'];
 
-    // Read messages from log file
     $messages = [];
     if (file_exists($logFilePath)) {
         $logContents = file_get_contents($logFilePath);
@@ -28,8 +26,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Message History</title>
-    <link rel="stylesheet" href="/os/php/public/assets/css/messages.css">
-    <link rel="stylesheet" href="/os/php/public/assets/css/style.css">
+    <link rel="stylesheet" href="/public/assets/css/messages.css">
+    <link rel="stylesheet" href="/public/assets/css/style.css">
 
 </head>
 <body>
