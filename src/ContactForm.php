@@ -1,219 +1,151 @@
 <?php
+    /**
+     * Enables error reporting for all types of errors and warnings.
+     *
+     * - `error_reporting(E_ALL);`:
+     *   Configures PHP to report all errors, warnings, and notices.
+     *   This is useful during development to identify and fix issues.
+     *
+     * - `ini_set('display_errors', 1);`:
+     *   Ensures that errors are displayed in the browser or output.
+     *   This is helpful for debugging but should be disabled in production
+     *   environments to avoid exposing sensitive information.
+     */
+    // ! error_reporting(E_ALL);
+    // ! ini_set('display_errors', 1);
+
     class ContactForm
     {
+        //form configuration
         private $config;
-        private $errors      = [];
+        // validation errors
+        private $errors = [];
+        // data entered from the user
         private $formData    = [];
         private $isSubmitted = false;
         private $isValid     = false;
-
-        public function __construct($config)
+        //instance of validator & logger classes
+        private $validator;
+        private $logger;
+        public function __construct(array $config)
         {
-            $this->config = $config;
+            $this->config    = $config['form'];
+            $this->validator = new FormValidator($config);
+            $this->logger    = new DataLogger($config['form']['log_file']);
+            $this->initializeFormData();
         }
-        // ? build class for FormValidation
         // ? DataLogger for logging user data
-
-    }
-
-    // importing form configration file
-    $config = require_once './app.config.php';
-    define("FORM_CONFIG", $config['form']);
-
-    $err_msg = [
-        "name"    => [
-            "empty"  => "Please enter your name.",
-            "length" => "Name must be less than 100 characters.",
-        ],
-        "email"   => [
-            "empty"  => "Email address is required.",
-            "format" => "Please enter a valid email address (example@domain.com).",
-        ],
-        "message" => [
-            "empty"  => "Please enter your message.",
-            "length" => "Message must be between 10 and 255 characters.",
-        ],
-    ];
-    $errors_to_show = [
-        "name_err"    => "",
-        "email_err"   => "",
-        "message_err" => "",
-    ];
-    $is_form_valid     = false;
-    $is_form_submitted = false;
-
-    function checkName(): string
-    {
-        global $err_msg;
-        $error = "";
-        if (isset($_POST['name'])) {
-            $name = trim($_POST['name']);
-            if (empty($name)) {
-                $error = $err_msg['name']['empty'];
-            } else if (strlen($name) > FORM_CONFIG['max_name_length']) {
-                $error = $err_msg['name']['length'];
+        public function initializeFormData()
+        {
+            $this->formData = [
+                'name'    => '',
+                'email'   => '',
+                'message' => '',
+            ];
+        }
+        private function clearForm()
+        {
+            header('Location: ' . htmlspecialchars($_SERVER['PHP_SELF']));
+            exit;
+        }
+        private function sanitizeInput($input)
+        {
+            return trim(strip_tags($input));
+        }
+        public function handle_submit()
+        {
+            if (isset($_GET['clear'])) {
+                // echo "Clearing form<br>";
+                $this->clearForm();
+                return;
             }
-        }
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                // echo "POST request detected<br>";
+                $this->isSubmitted = true;
 
-        return $error;
-    }
-    function checkEmail(): string
-    {
-        global $err_msg;
-        $error = "";
-        if (isset($_POST['email'])) {
-            $email = trim($_POST['email']);
-            if (empty($email)) {
-                $error = $err_msg['email']['empty'];
-            } else if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $error = $err_msg['email']['format'];
-            }
-        }
+                $this->collectFormData();
 
-        return $error;
-    }
-    function checkMessage(): string
-    {
-        global $err_msg;
-        $error = "";
-        if (isset($_POST['message'])) {
-            $msg = trim($_POST['message']);
-            if (empty($msg)) {
-                $error = $err_msg['message']['empty'];
-            } else if (strlen($msg) < 10 || strlen($msg) > FORM_CONFIG['max_msg_length']) {
-                $error = $err_msg['message']['length'];
-            }
-        }
+                $this->errors = $this->validator->validate($this->formData);
 
-        return $error;
-    }
-    function handle_submit()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            global $is_form_submitted;
-            $is_form_submitted = true;
-            validate_form();
-            // To print to browser console
-            // echo "<script>console.log(" . json_encode(trim($_POST['message'])) . ");</script>";
-            // echo "<script>console.log(" . json_encode($form_config) . ");</script>";
-        }
-    }
-    function validate_form()
-    {
-        $errors_to_show['name_err']    = checkName();
-        $errors_to_show['email_err']   = checkEmail();
-        $errors_to_show['message_err'] = checkMessage();
-        if (empty($errors_to_show['name_err']) &&
-            empty($errors_to_show['email_err']) &&
-            empty($errors_to_show['message_err'])) {
-            global $is_form_valid;
-            $is_form_valid = true;
-        }
-    }
-    // check if user submited
-    function log_user_data()
-    {
-        global $is_form_valid;
-        if ($is_form_valid) {
-            $handle_file = fopen("messages.log.txt", "a");
-            feof($handle_file);
-            fwrite($handle_file, (string) $_POST['name'] . $_POST['email'] . PHP_EOL);
-            fclose($handle_file);
-        }
+                $this->isValid = (empty($this->errors['name_err'])
+                    && empty($this->errors['email_err'])
+                    && empty($this->errors['message_err']));
 
-    }
-    echo "<script>console.log(" . "submitted:" . "," . json_encode($is_form_submitted), "valid:", json_encode($is_form_valid), "errors:", json_encode($errors_to_show) . ");</script>";
-    handle_submit();
-?>
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> contact form </title>
-    <link rel="stylesheet" href="/os/php/public/assets/css/style.css">
-</head>
-
-<body>
-    <header>
-        <a href="">Messages History</a>
-    </header>
-    <main>
-        <form id="contact_form" class="contactForm" action="#" method="POST" enctype="multipart/form-data">
-            <div>
-                <div class="header">
-                    <h3> Contact Form </h3>
-                </div>
-                <div class="after_submit">
-                    <?php
-                        global $is_form_valid;
-                        if (
-                            $is_form_valid) {
-                        ?>
-                        <p class='success'><?php echo(FORM_CONFIG['thanks_msg']); ?></p>
-                    <?php
-                        }
-                    ?>
-                </div>
-                <div class="row">
-                    <label class="required" for="name"> Name</label>
-                    <input id="name" class="input" name="name" placeholder="Enter your name" type="text" value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>" />
-                    <div class="err-container">
-                        <?php
-                        if ($is_form_submitted && ! empty($errors_to_show['name_err'])) {?>
-                            <p class="errMsg" id="name_err"><?php echo($errors_to_show['name_err']) ?></p>
-                        <?php
-                            }
-                        ?>
-                    </div>
-
-                </div>
-                <div class="row">
-                    <label class="required" for="email"> Email</label>
-                    <input id="email" class="input" name="email" type="text" placeholder="example@domain.com" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" size="30" />
-                    <div class="err-container">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              <?php
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              if ($is_form_submitted && ! empty($errors_to_show['email_err'])) {?>
-                            <p class="errMsg" id="email_err"><?php echo($errors_to_show['email_err']) ?></p>
-                        <?php
-                            }
-                        ?>
-                    </div>
-
-
-                </div>
-                <div class="row">
-                    <label class="required" for="message"> Message</label>
-                    <textarea id="message" class="input" name="message" placeholder="Tell us your message"
-                        autocomplete="true" rows="7"><?php echo isset($_POST['message']) ? htmlspecialchars($_POST['message']) : ''; ?></textarea>
-                    <div class="err-container">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              <?php
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              if ($is_form_submitted && ! empty($errors_to_show['message_err'])) {?>
-                            <p class="errMsg" id="message_err"><?php echo($errors_to_show['message_err']) ?></p>
-                        <?php
-                            }
-                        ?>
-                    </div>
-
-
-                </div>
-
-                <div class="buttons">
-                    <input id="submit" name="submit" type="submit" value="Send email" />
-                    <input id="clear" name="clear" type="submit" value="Clear Form" formnovalidate formaction="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>?clear=true" />
-                </div>
-            </div>
-
-
-            <?php
-                if (isset($_GET['clear'])) {
-                    // Reset all form values
-                    $_POST = [];
-                    echo '<script>window.location.href = "' . htmlspecialchars($_SERVER['PHP_SELF']) . '";</script>';
+                if ($this->isValid) {
+                    $this->logger->logSubmission($this->formData);
                 }
-            ?>
+            }
+        }
+        public function collectFormData()
+        {
+            $this->formData = [
+                'name'    => $this->sanitizeInput($_POST['name'] ?? ''),
+                'email'   => $this->sanitizeInput($_POST['email'] ?? ''),
+                'message' => $this->sanitizeInput($_POST['message'] ?? ''),
+            ];
+        }
+        public function renderForm()
+        {
+        ?>
+            <form id="contact_form" class="contactForm" action="#" method="POST">
+                <div>
+                    <div class="header">
+                        <h3>Contact Form</h3>
+                    </div>
+                    <div class="after_submit">
+                    <?php
+                    if ($this->isSubmitted && $this->isValid) {?>
+                            <p class="success-message"><?php echo htmlspecialchars($this->config['thanks_msg']); ?></p>
+                            <?php
+                                }
+                                    ?>
+                    </div>
+                    <!-- Name Field -->
+                    <div class="row">
+                        <label class="required" for="name">Name</label>
+                        <input id="name" class="input                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       <?php echo isset($this->errors['name']) ? 'error' : ''; ?>"
+                               name="name" placeholder="Enter your name" type="text"
+                               value="<?php echo htmlspecialchars($this->formData['name']); ?>" />
+                        <?php if ($this->isSubmitted && isset($this->errors['name_err'])): ?>
+                            <div class="err-container">
+                                <p class="errMsg" id="name_err"><?php echo htmlspecialchars($this->errors['name_err']); ?></p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
 
-        </form>
-    </main>
-</body>
+                    <!-- Email Field -->
+                    <div class="row">
+                        <label class="required" for="email">Email</label>
+                        <input id="email" class="input                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     <?php echo isset($this->errors['email']) ? 'error' : ''; ?>"
+                               name="email" type="text" placeholder="example@domain.com"
+                               value="<?php echo htmlspecialchars($this->formData['email']); ?>" />
+                        <?php if ($this->isSubmitted && isset($this->errors['email_err'])): ?>
+                            <div class="err-container">
+                                <p class="errMsg" id="email_err"><?php echo htmlspecialchars($this->errors['email_err']); ?></p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
 
-</html>
+                    <!-- Message Field -->
+                    <div class="row">
+                        <label class="required" for="message">Message</label>
+                        <textarea id="message" class="input                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           <?php echo isset($this->errors['message']) ? 'error' : ''; ?>"
+                                  name="message" placeholder="Tell us your message" rows="7" cols="30"><?php echo htmlspecialchars($this->formData['message']); ?></textarea>
+                        <?php if ($this->isSubmitted && isset($this->errors['message_err'])): ?>
+                            <div class="err-container">
+                                <p class="errMsg" id="message_err"><?php echo htmlspecialchars($this->errors['message_err']); ?></p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Form Buttons -->
+                    <div class="buttons">
+                        <input id="submit" name="submit" type="submit" value="Send email" />
+                        <input id="clear" name="clear" type="submit" value="Clear Form"
+                               formnovalidate formaction="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>?clear=true" />
+                    </div>
+                </div>
+            </form>
+            <?php
+                }
+            }

@@ -163,11 +163,12 @@ textarea:hover {
   justify-content: left;
   /* margin: auto; */
   padding-left: 0.5em;
-  margin-bottom: 1em;
+  margin-bottom: 0em;
 }
 
 .err-container {
-  height: 2.8em;
+  display: block;
+  min-height: 2em;
 }
 .errMsg {
   height: fit-content;
@@ -210,7 +211,7 @@ textarea:hover {
   justify-content: center;
   height: 2em;
 }
-.success {
+.success-message {
   margin: auto;
   text-align: center;
   color: rgb(0, 187, 115);
