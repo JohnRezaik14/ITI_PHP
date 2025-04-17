@@ -96,15 +96,28 @@ main {
 }
 p {
   width: fit-content;
-  margin: 0%;
   padding: 0.1em 0;
 }
 .visitors-count {
   width: fit-content;
   margin: auto;
   margin-top: 1rem;
-  font-size: 1.3rem;
-  color: cadetblue;
+  font-size: 1.5rem;
+  color: rgb(220, 177, 255);
+}
+.count {
+  font-family: "Courier New", Courier, monospace;
+  font-weight: 700;
+  font-size: 2.5rem;
+  text-shadow: 0 0 2em rgb(255, 255, 255);
+}
+.count:hover {
+  cursor: pointer;
+  transform: rotateZ(20deg);
+  -webkit-transform: rotateZ(20deg);
+  -moz-transform: rotateZ(20deg);
+  -ms-transform: rotateZ(20deg);
+  -o-transform: rotateZ(20deg);
 }
 label,
 input,

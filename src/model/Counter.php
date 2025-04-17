@@ -13,7 +13,6 @@ final class Counter
             file_put_contents($filePath, 0);
         }
         $count = (int) file_get_contents($filePath);
-
         if (! $isCounted) {
             $count++;
             file_put_contents($filePath, $count);
