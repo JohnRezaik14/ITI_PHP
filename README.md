@@ -1,7 +1,18 @@
-# PHP Labs
+# PHP_OS Labs
+
+🎥 [Watch Last Version Video](https://drive.google.com/file/d/1fWLSUgPx07dH5d7dk99AZX5DZ64mX-Jq/view?usp=sharing)
+
+## 🔹 Lab 3 – Unique Visit Counter 
+- Counts unique browser visits using OOP
+- Session flags to avoid duplicate counts
+- File-based storage for total visits
+
+## 🔹 Lab 2 – Contact Form Logging 
+- Logs name, email, IP, and timestamp after form submission
+- Log viewer interface to display records
+- Config-driven paths and settings
 
 ## Lab 1: Introduction to PHP
-
 #### Creating a Simple Contact Form with Validation
 
 <div style="width: 100%; max-width: 640px; margin: 20px auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;">
@@ -16,7 +27,6 @@
 
 ### Resources
 
-- [Lab 1 Video](https://drive.google.com/file/d/1ipvRojJc6aYESj41lSm3TNE4mNgT8rZc/view?usp=sharing)
 - [PHP Official Documentation](https://www.php.net/docs.php)
 - [PHP W3Schools](https://www.w3schools.com/php/default.asp)
   4
